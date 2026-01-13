@@ -19,6 +19,7 @@ function normalize(raw: any): NormalizeData{
 		category: raw.type || 'Other',
 		// type == category
 		type: raw.type || 'Other',
+		///TODO ∈
 		status: raw.status || 'Unknown',
 		logoUrl: raw.logo || ''
 	};
