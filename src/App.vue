@@ -11,7 +11,7 @@ import datatable from '@/composents/DataTable.vue'
 <template>
 	<div id="app">
 		<header>
-		<h1>Coverage App</h1>
+		<h1>Rollee</h1>
 		</header>
 		<main>
 			<datatable />

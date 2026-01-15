@@ -38,12 +38,8 @@ export function useDataSource() {
 			);
 			if (!response.ok) throw new Error("Erreur réseau");
 			const data = await response.json();
-			console.log("Data reçue:", data);
 			const rawItems = data.datasources;
 			dataSources.value = rawItems.map(normalize);
-			console.log("Data reçue:", dataSources.value);
-			console.log("test1:", dataSources.value[0].id);
-			console.log("length :", dataSources.value.length);
 		} catch (err) {
 			error.value = err.message;
 		} finally {

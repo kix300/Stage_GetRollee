@@ -1,128 +1,278 @@
-//TODO Datatable -> where we will find all data
-//SearchBar
-//TabBar
-//Sorting
-
-
 <script setup lang="ts">
+import { computed, ref } from 'vue';
 import { useDataSource } from '@/composables/useDatasource';
+import { stableSort, toggleSortOrder, type SortOrder } from '@/utils/sorting';
+import CatTab from './CatTab.vue';
 
 const { dataSources, loading, error } = useDataSource();
+
+const sortColumn = ref<'name' | 'type' | 'status'>('name');
+const sortOrder = ref<SortOrder>('asc');
+const searchQuery = ref('');
+const selectedCategory = ref('All Platforms');
+
+const handleSort = (column: 'name' | 'type' | 'status') => {
+	sortOrder.value = toggleSortOrder(sortColumn.value, column, sortOrder.value);
+	sortColumn.value = column;
+};
+
+const categoryFilteredData = computed(() => {
+	if (!dataSources.value) return [];
+
+	if (selectedCategory.value === 'All Platforms') {
+		return dataSources.value;
+	}
+
+	return dataSources.value.filter(item => item.category === selectedCategory.value);
+});
+
+const searchFilteredData = computed(() => {
+	if (!searchQuery.value.trim()) {
+		return categoryFilteredData.value;
+	}
+
+	const query = searchQuery.value.toLowerCase();
+
+	return categoryFilteredData.value.filter(item => 
+		item.name.toLowerCase().includes(query)
+	);
+});
+
+const sortedDataSources = computed(() => {
+	return stableSort(searchFilteredData.value, sortColumn.value, sortOrder.value);
+});
+
+const getSortIcon = (column: 'name' | 'type' | 'status') => {
+	if (sortColumn.value !== column) return '⇅';
+	return sortOrder.value === 'asc' ? '↑' : '↓';
+};
 </script>
 
 <template>
-  <div class="data-table-container">
+	<div class="data-table-container">
 
-    <div v-if="loading" class="loading">
-      Chargement des données...
-    </div>
+		<div v-if="loading" class="loading">
+			Chargement des données...
+		</div>
 
-    <div v-else-if="error" class="error">
-      Erreur: {{ error }}
-    </div>
+		<div v-else-if="error" class="error">
+			Erreur: {{ error }}
+		</div>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in dataSources" :key="item.id">
-            <td class="name-cell">
-              <img 
-                v-if="item.logoUrl" 
-                :src="item.logoUrl" 
-                :alt="item.name"
-                class="logo"
-              />
-              <span>{{ item.name }}</span>
-            </td>
-            
-            <td>{{ item.type }}</td>
-            
-            <td>
-              <span :class="['status-badge', `status-${item.status.toLowerCase().replace(' ', '-')}`]">
-                {{ item.status }}
-              </span>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+		<div v-else class="data-table">
+			<CatTab 
+				:data="dataSources" 
+				:selectedCategory="selectedCategory"
+				@update:selectedCategory="selectedCategory = $event"
+			/>
+
+			<div class="search-bar">
+				<input 
+					v-model="searchQuery"
+					type="text"
+					placeholder="Search by name..."
+					class="search-input"
+				/>
+				<span v-if="searchQuery" class="search-clear" @click="searchQuery = ''">✕</span>
+			</div>
+
+			<table>
+				<thead>
+					<tr>
+						<th 
+							class="sortable" 
+							@click="handleSort('name')"
+							:class="{ active: sortColumn === 'name' }"
+						>
+							Name
+							<span class="sort-icon">{{ getSortIcon('name') }}</span>
+						</th>
+						<th 
+							class="sortable" 
+							@click="handleSort('type')"
+							:class="{ active: sortColumn === 'type' }"
+						>
+							Type
+							<span class="sort-icon">{{ getSortIcon('type') }}</span>
+						</th>
+						<th 
+							class="sortable" 
+							@click="handleSort('status')"
+							:class="{ active: sortColumn === 'status' }"
+						>
+							Status
+							<span class="sort-icon">{{ getSortIcon('status') }}</span>
+						</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr v-for="item in sortedDataSources" :key="item.id">
+						<td class="name-cell">
+							<img 
+								v-if="item.logoUrl" 
+								:src="item.logoUrl" 
+								:alt="item.name"
+								class="logo"
+							/>
+							<span>{{ item.name }}</span>
+						</td>
+
+						<td>{{ item.type }}</td>
+
+						<td>
+							<span :class="['status-badge', `status-${item.status.toLowerCase().replace(' ', '-')}`]">
+								{{ item.status }}
+							</span>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<div v-if="sortedDataSources.length === 0" class="no-results">
+				<span v-if="searchQuery">None where find for "{{ searchQuery }}"</span>
+				<span v-else>None can be found</span>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
 .data-table-container {
-  padding: 20px;
+	padding: 20px;
 }
 
 .loading, .error {
-  text-align: center;
-  padding: 40px;
-  font-size: 18px;
+	text-align: center;
+	padding: 40px;
+	font-size: 18px;
 }
 
 .error {
-  color: #e74c3c;
+	color: #e74c3c;
 }
 
 .data-table {
-  width: 100%;
+	width: 100%;
+}
+
+.search-bar {
+	position: relative;
+	margin-bottom: 20px;
+}
+
+.search-input {
+	width: 100%;
+	padding: 12px 40px 12px 16px;
+	font-size: 16px;
+	border: 2px solid #dee2e6;
+	border-radius: 8px;
+	outline: none;
+	transition: border-color 0.2s;
+	box-sizing: border-box;
+}
+
+.search-input:focus {
+	border-color: #007bff;
+}
+
+.search-clear {
+	position: absolute;
+	right: 12px;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
+	color: #6c757d;
+	font-size: 20px;
+	padding: 4px 8px;
+	user-select: none;
+}
+
+.search-clear:hover {
+	color: #495057;
 }
 
 table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
 }
 
 thead {
-  background-color: #f8f9fa;
+	background-color: #f8f9fa;
 }
 
 th {
-  padding: 12px;
-  text-align: left;
-  font-weight: 600;
-  border-bottom: 2px solid #dee2e6;
+	padding: 12px;
+	text-align: left;
+	font-weight: 600;
+	border-bottom: 2px solid #dee2e6;
+	user-select: none;
+}
+
+th.sortable {
+	cursor: pointer;
+	transition: background-color 0.2s;
+}
+
+th.sortable:hover {
+	background-color: #e9ecef;
+}
+
+th.sortable.active {
+	background-color: #dee2e6;
+	color: #007bff;
+}
+
+.sort-icon {
+	margin-left: 8px;
+	font-size: 12px;
+	opacity: 0.5;
+}
+
+th.sortable.active .sort-icon {
+	opacity: 1;
+	color: #007bff;
 }
 
 td {
-  padding: 12px;
-  border-bottom: 1px solid #dee2e6;
+	padding: 12px;
+	border-bottom: 1px solid #dee2e6;
 }
 
 .name-cell {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+	display: flex;
+	align-items: center;
+	gap: 10px;
 }
 
 .logo {
-  width: 32px;
-  height: 32px;
-  object-fit: contain;
+	width: 32px;
+	height: 32px;
+	object-fit: contain;
 }
 
 .status-badge {
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 14px;
-  font-weight: 500;
+	padding: 4px 12px;
+	border-radius: 12px;
+	font-size: 14px;
+	font-weight: 500;
 }
 
 .status-working {
-  background-color: #d4edda;
-  color: #155724;
+	background-color: #d4edda;
+	color: #155724;
 }
 
 .status-coming-soon {
-  background-color: #fff3cd;
-  color: #856404;
+	background-color: #fff3cd;
+	color: #856404;
+}
+
+.no-results {
+	text-align: center;
+	padding: 40px;
+	color: #6c757d;
+	font-style: italic;
 }
 </style>
-
 
