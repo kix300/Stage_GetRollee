@@ -29,7 +29,7 @@ export function useDataSource() {
 	onMounted(async () => {
 		try {
 			const response = await fetch(
-				"https://api.getrollee.com/api/dashboard/v0.1/documentation/datasourcess",
+				"https://api.getrollee.com/api/dashboard/v0.1/documentation/datasources",
 			);
 			if (!response.ok) throw new Error("Network Error");
 			const data = await response.json();

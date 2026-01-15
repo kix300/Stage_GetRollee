@@ -39,6 +39,7 @@ const categoryCounts = computed(() => {
 
 	props.data.forEach(item => {
 		const category = item.category;
+		counts[category] = (counts[category] || 0) + 1;
 		if (category in counts) {
 			counts[category]++;
 		}
