@@ -10,16 +10,11 @@ interface NormalizeData {
 }
 
 function normalize(raw: any): NormalizeData {
-	// if api change we will change the type after raw
 	return {
 		id: raw.id || "Unknown",
 		name: raw.title || "Unknown",
-		// for our category tab
-		//( All Platforms, Gig Economy, Payments, Payroll & HRIS, Tax Portals, Utilities)
 		category: raw.type || "Other",
-		// type == category
 		type: raw.type || "Other",
-		///TODO ∈
 		status:
 		raw.status?.toLowerCase() === "working" ? "Working" : "Comming soon",
 		logoUrl: raw.logo || "",
