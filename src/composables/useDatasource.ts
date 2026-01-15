@@ -29,14 +29,18 @@ export function useDataSource() {
 	onMounted(async () => {
 		try {
 			const response = await fetch(
-				"https://api.getrollee.com/api/dashboard/v0.1/documentation/datasources",
+				"https://api.getrollee.com/api/dashboard/v0.1/documentation/datasourcess",
 			);
-			if (!response.ok) throw new Error("Erreur réseau");
+			if (!response.ok) throw new Error("Network Error");
 			const data = await response.json();
 			const rawItems = data.datasources;
 			dataSources.value = rawItems.map(normalize);
 		} catch (err) {
-			error.value = err.message;
+			if (err instanceof Error){
+				error.value = err.message;
+			}else {
+				error.value = "Unknown Error";
+			}
 		} finally {
 			loading.value = false;
 		}
