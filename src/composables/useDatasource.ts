@@ -16,7 +16,7 @@ function normalize(raw: any): NormalizeData {
 		category: raw.type || "Other",
 		type: raw.type || "Other",
 		status:
-		raw.status?.toLowerCase() === "working" ? "Working" : "Comming soon",
+		raw.status?.toLowerCase() === "working" ? "Working" : "Coming soon",
 		logoUrl: raw.logo || "",
 	};
 }

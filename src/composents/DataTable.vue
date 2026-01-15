@@ -52,20 +52,14 @@ const getSortIcon = (column: 'name' | 'type' | 'status') => {
 	<div class="data-table-container">
 
 		<div v-if="loading" class="loading">
-			Chargement des données...
+			loading...
 		</div>
 
 		<div v-else-if="error" class="error">
-			Erreur: {{ error }}
+			Error: {{ error }}
 		</div>
 
 		<div v-else class="data-table">
-			<CatTab 
-				:data="dataSources" 
-				:selectedCategory="selectedCategory"
-				@update:selectedCategory="selectedCategory = $event"
-			/>
-
 			<div class="search-bar">
 				<input 
 					v-model="searchQuery"
@@ -75,7 +69,14 @@ const getSortIcon = (column: 'name' | 'type' | 'status') => {
 				/>
 				<span v-if="searchQuery" class="search-clear" @click="searchQuery = ''">✕</span>
 			</div>
+			<CatTab 
+				:data="dataSources" 
+				:selectedCategory="selectedCategory"
+				@update:selectedCategory="selectedCategory = $event"
+			/>
 
+
+			<div class="table-container">
 			<table>
 				<thead>
 					<tr>
@@ -84,7 +85,7 @@ const getSortIcon = (column: 'name' | 'type' | 'status') => {
 							@click="handleSort('name')"
 							:class="{ active: sortColumn === 'name' }"
 						>
-							Name
+							Platforms	
 							<span class="sort-icon">{{ getSortIcon('name') }}</span>
 						</th>
 						<th 
@@ -119,14 +120,20 @@ const getSortIcon = (column: 'name' | 'type' | 'status') => {
 
 						<td>{{ item.type }}</td>
 
-						<td>
-							<span :class="['status-badge', `status-${item.status.toLowerCase().replace(' ', '-')}`]">
-								{{ item.status }}
-							</span>
-						</td>
-					</tr>
-				</tbody>
-			</table>
+							<td class="status-cell">
+								<span :class="['status-badge', `status-${item.status.toLowerCase().replace(' ', '-')}`]">
+
+									<span v-if="item.status.toLowerCase() === 'working'" class="icon">✓</span>
+
+									<span v-if="item.status.toLowerCase() === 'coming soon'" class="icon"><img src="https://cdn-icons-png.flaticon.com/512/2089/2089758.png" width="10" height="10" alt="clock" title="clock"></span>
+
+									{{ item.status }}
+								</span>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
 
 			<div v-if="sortedDataSources.length === 0" class="no-results">
 				<span v-if="searchQuery">None where find for "{{ searchQuery }}"</span>
@@ -191,10 +198,19 @@ const getSortIcon = (column: 'name' | 'type' | 'status') => {
 	color: #495057;
 }
 
+.table-container { 
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+	padding: 20px;
+	background-color: #E9EEF0;
+	overflow: hidden;
+}
+
 table {
+	background-color: white;
 	width: 100%;
 	border-collapse: collapse;
-	margin-top: 20px;
 }
 
 thead {
@@ -205,7 +221,6 @@ th {
 	padding: 12px;
 	text-align: left;
 	font-weight: 600;
-	border-bottom: 2px solid #dee2e6;
 	user-select: none;
 }
 
@@ -214,14 +229,9 @@ th.sortable {
 	transition: background-color 0.2s;
 }
 
-th.sortable:hover {
-	background-color: #e9ecef;
-}
-
-th.sortable.active {
-	background-color: #dee2e6;
-	color: #007bff;
-}
+/* th.sortable:hover { */
+/* 	background-color: #e9ecef; */
+/* } */
 
 .sort-icon {
 	margin-left: 8px;

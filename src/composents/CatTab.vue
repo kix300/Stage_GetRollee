@@ -76,20 +76,18 @@ const selectCategory = (category: string) => {
 .tab-bar {
 	display: flex;
 	gap: 8px;
-	border-bottom: 2px solid #dee2e6;
-	overflow-x: auto;
 	flex-wrap: wrap;
 }
 
 .tab {
 	padding: 12px 20px;
 	border: none;
-	background: none;
+	border-radius: 30px;
+	background: #E9EEF0;
 	cursor: pointer;
 	font-size: 14px;
 	font-weight: 500;
 	color: #6c757d;
-	border-bottom: 3px solid transparent;
 	transition: all 0.3s ease;
 	white-space: nowrap;
 	display: flex;
@@ -105,11 +103,10 @@ const selectCategory = (category: string) => {
 
 .tab.active {
 	color: #007bff;
-	border-bottom-color: #007bff;
 }
 
 .tab .count {
-	background-color: #e9ecef;
+	background: #E9EEF0;
 	color: #495057;
 	padding: 2px 8px;
 	border-radius: 12px;
