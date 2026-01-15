@@ -1,5 +1,9 @@
 # Stage_GetRollee
 
+## Todo
+
+- CSS
+- Test on Sorting
 
 ## Project Setup
 
