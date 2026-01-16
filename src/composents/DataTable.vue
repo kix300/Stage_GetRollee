@@ -82,6 +82,8 @@ const getSortIcon = (column: "name" | "type" | "status") => {
           type="text"
           placeholder="Search by name..."
           class="search-input"
+          aria-label="Search platforms by name"
+          :aria-describedby="searchQuery ? 'search-results-count' : undefined"
         />
         <span v-if="searchQuery" class="search-clear" @click="searchQuery = ''"
           >✕</span
@@ -101,6 +103,18 @@ const getSortIcon = (column: "name" | "type" | "status") => {
                 class="sortable"
                 @click="handleSort('name')"
                 :class="{ active: sortColumn === 'name' }"
+                role="button"
+                tabindex="0"
+                @keydown.enter="handleSort('name')"
+                @keydown.space.prevent="handleSort('name')"
+                :aria-label="`Sort by Platforms ${sortColumn === 'name' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : ''}`"
+                :aria-sort="
+                  sortColumn === 'name'
+                    ? sortOrder === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none'
+                "
               >
                 Platforms
                 <span class="sort-icon">{{ getSortIcon("name") }}</span>
@@ -109,6 +123,18 @@ const getSortIcon = (column: "name" | "type" | "status") => {
                 class="sortable"
                 @click="handleSort('type')"
                 :class="{ active: sortColumn === 'type' }"
+                role="button"
+                tabindex="0"
+                @keydown.enter="handleSort('type')"
+                @keydown.space.prevent="handleSort('type')"
+                :aria-label="`Sort by Platforms ${sortColumn === 'type' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : ''}`"
+                :aria-sort="
+                  sortColumn === 'type'
+                    ? sortOrder === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none'
+                "
               >
                 Type
                 <span class="sort-icon">{{ getSortIcon("type") }}</span>
@@ -117,6 +143,18 @@ const getSortIcon = (column: "name" | "type" | "status") => {
                 class="sortable"
                 @click="handleSort('status')"
                 :class="{ active: sortColumn === 'status' }"
+                role="button"
+                tabindex="0"
+                @keydown.enter="handleSort('status')"
+                @keydown.space.prevent="handleSort('status')"
+                :aria-label="`Sort by Platforms ${sortColumn === 'status' ? (sortOrder === 'asc' ? 'ascending' : 'descending') : ''}`"
+                :aria-sort="
+                  sortColumn === 'status'
+                    ? sortOrder === 'asc'
+                      ? 'ascending'
+                      : 'descending'
+                    : 'none'
+                "
               >
                 Status
                 <span class="sort-icon">{{ getSortIcon("status") }}</span>
@@ -233,6 +271,11 @@ const getSortIcon = (column: "name" | "type" | "status") => {
   color: #495057;
 }
 
+.search-clear:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
 .table-container {
   border: 1px solid #e0e0e0;
   border-radius: 8px;
@@ -262,6 +305,12 @@ th {
 th.sortable {
   cursor: pointer;
   transition: background-color 0.2s;
+}
+
+th.sortable:focus {
+  outline: 2px solid #007bff;
+  outline-offset: -2px;
+  background-color: #e9ecef;
 }
 
 /* th.sortable:hover { */
